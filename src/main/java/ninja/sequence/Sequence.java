@@ -135,7 +135,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Boolean> of(final boolean[] array) {
+	public static Sequence<Boolean> of(boolean[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -150,7 +150,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Byte> of(final byte[] array) {
+	public static Sequence<Byte> of(byte[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -165,7 +165,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Character> of(final char[] array) {
+	public static Sequence<Character> of(char[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -180,7 +180,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Double> of(final double[] array) {
+	public static Sequence<Double> of(double[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -195,7 +195,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Float> of(final float[] array) {
+	public static Sequence<Float> of(float[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -210,7 +210,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Integer> of(final int[] array) {
+	public static Sequence<Integer> of(int[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -225,7 +225,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Long> of(final long[] array) {
+	public static Sequence<Long> of(long[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
@@ -240,7 +240,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
-	public static Sequence<Short> of(final short[] array) {
+	public static Sequence<Short> of(short[] array) {
 		if (array == null) {
 			throw new IllegalArgumentException("array must not be null.");
 		}
