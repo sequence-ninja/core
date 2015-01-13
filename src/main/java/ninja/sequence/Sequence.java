@@ -526,14 +526,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final <K, R extends Map<K, T>> R asMap(R map, Func<? super T, ? extends K> keySelector) {
-		Check.argumentNotNull(map, "map must not be null.");
-		Check.argumentNotNull(keySelector, "keySelector must not be null.");
-
-		for (T element : source) {
-			map.put(keySelector.invoke(element), element);
-		}
-
-		return map;
+		return asMap(map, keySelector, Funcs.<T>forward());
 	}
 
 	/**
