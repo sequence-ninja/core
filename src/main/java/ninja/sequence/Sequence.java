@@ -19,25 +19,26 @@ import ninja.sequence.delegate.EqualityComparator;
 import ninja.sequence.delegate.Func;
 import ninja.sequence.delegate.Func2;
 import ninja.sequence.delegate.Predicate;
+import ninja.sequence.internal.ArrayIterable;
 import ninja.sequence.internal.ArrayIterator;
 import ninja.sequence.internal.BindIterator;
 import ninja.sequence.internal.BooleanArrayIterable;
-import ninja.sequence.internal.ByteArrayIterator;
-import ninja.sequence.internal.CharArrayIterator;
+import ninja.sequence.internal.ByteArrayIterable;
+import ninja.sequence.internal.CharArrayIterable;
 import ninja.sequence.internal.ConcatIterator;
 import ninja.sequence.internal.DifferenceIterator;
 import ninja.sequence.internal.DistinctIterator;
-import ninja.sequence.internal.DoubleArrayIterator;
-import ninja.sequence.internal.FloatArrayIterator;
-import ninja.sequence.internal.IntArrayIterator;
+import ninja.sequence.internal.DoubleArrayIterable;
+import ninja.sequence.internal.FloatArrayIterable;
+import ninja.sequence.internal.IntArrayIterable;
 import ninja.sequence.internal.InvertedListIterator;
 import ninja.sequence.internal.JoinIterator;
-import ninja.sequence.internal.LongArrayIterator;
+import ninja.sequence.internal.LongArrayIterable;
 import ninja.sequence.internal.MapIterator;
 import ninja.sequence.internal.RangeIterator;
 import ninja.sequence.internal.RepeatIterator;
 import ninja.sequence.internal.SelectIterator;
-import ninja.sequence.internal.ShortArrayIterator;
+import ninja.sequence.internal.ShortArrayIterable;
 import ninja.sequence.internal.SkipIterator;
 import ninja.sequence.internal.SkipWhileIterator;
 import ninja.sequence.internal.TakeIterator;
@@ -80,7 +81,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static <T> Sequence<T> of(Iterable<T> iterable) {
-		Check.argumentNotNull(iterable, "iterable must not be null.");
+		if (iterable == null) {
+			throw new IllegalArgumentException("iterable must not be null.");
+		}
 
 		return new Sequence<T>(iterable);
 	}
@@ -93,22 +96,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static <K, V> Sequence<Map.Entry<K, V>> of(Map<K, V> map) {
-		Check.argumentNotNull(map, "map must not be null.");
+		if (map == null) {
+			throw new IllegalArgumentException("map must not be null.");
+		}
 
 		return new Sequence<Map.Entry<K, V>>(map.entrySet());
-	}
-
-	public static <T> Sequence<T> of(final T[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
-
-		return new Sequence<T>(
-			new Iterable<T>() {
-				@Override
-				public Iterator<T> iterator() {
-					return new ArrayIterator<T>(array);
-				}
-			}
-		);
 	}
 
 	/**
@@ -117,17 +109,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param <T>
 	 * @return
 	 */
-	public static <T> Sequence<T> of(T first, final T... array) {
-		Check.argumentNotNull(array, "array must not be null.");
-
-		return new Sequence<T>(
-			new Iterable<T>() {
-				@Override
-				public Iterator<T> iterator() {
-					return new ArrayIterator<T>(array);
-				}
-			}
-		);
+	public static <T> Sequence<T> of(T... array) {
+		return new Sequence<T>(new ArrayIterable<T>(array));
 	}
 
 	/**
@@ -149,16 +132,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Byte> of(final byte[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Byte>(
-			new Iterable<Byte>() {
-				@Override
-				public Iterator<Byte> iterator() {
-					return new ByteArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Byte>(new ByteArrayIterable(array));
 	}
 
 	/**
@@ -167,16 +145,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Character> of(final char[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Character>(
-			new Iterable<Character>() {
-				@Override
-				public Iterator<Character> iterator() {
-					return new CharArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Character>(new CharArrayIterable(array));
 	}
 
 	/**
@@ -185,16 +158,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Double> of(final double[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Double>(
-			new Iterable<Double>() {
-				@Override
-				public Iterator<Double> iterator() {
-					return new DoubleArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Double>(new DoubleArrayIterable(array));
 	}
 
 	/**
@@ -203,16 +171,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Float> of(final float[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Float>(
-			new Iterable<Float>() {
-				@Override
-				public Iterator<Float> iterator() {
-					return new FloatArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Float>(new FloatArrayIterable(array));
 	}
 
 	/**
@@ -221,16 +184,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Integer> of(final int[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Integer>(
-			new Iterable<Integer>() {
-				@Override
-				public Iterator<Integer> iterator() {
-					return new IntArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Integer>(new IntArrayIterable(array));
 	}
 
 	/**
@@ -239,16 +197,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Long> of(final long[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Long>(
-			new Iterable<Long>() {
-				@Override
-				public Iterator<Long> iterator() {
-					return new LongArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Long>(new LongArrayIterable(array));
 	}
 
 	/**
@@ -257,16 +210,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public static Sequence<Short> of(final short[] array) {
-		Check.argumentNotNull(array, "array must not be null.");
+		if (array == null) {
+			throw new IllegalArgumentException("array must not be null.");
+		}
 
-		return new Sequence<Short>(
-			new Iterable<Short>() {
-				@Override
-				public Iterator<Short> iterator() {
-					return new ShortArrayIterator(array);
-				}
-			}
-		);
+		return new Sequence<Short>(new ShortArrayIterable(array));
 	}
 
 	/**
@@ -1088,7 +1036,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return Returns a sequence where one or more values is prepended to it.
 
 	 */
-	public final Sequence<T> prepend(T[] other) {
+	@SafeVarargs
+	public final Sequence<T> prepend(T... other) {
 		Check.argumentNotNull(other, "other must not be null.");
 
 		return prepend(array(other));
