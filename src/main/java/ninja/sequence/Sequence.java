@@ -69,16 +69,25 @@ public class Sequence<T> implements Iterable<T> {
 		this.source = source;
 	}
 
+	/**
+	 * Returns an empty sequence.
+	 *
+	 * @param <T> the type of the sequence elements
+	 * @return an empty sequence
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Sequence<T> empty() {
 		return (Sequence<T>)EMPTY;
 	}
 
 	/**
+	 * Creates a new Sequence out of an iterable with the elements in the same
+	 * order as when iterating over the iterable.
 	 *
-	 * @param iterable
-	 * @param <T>
-	 * @return
+	 * @param iterable the iterable to create the new sequence from
+	 * @param <T> the type of the sequence elements
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code iterable} is {@code null}
 	 */
 	public static <T> Sequence<T> of(Iterable<T> iterable) {
 		if (iterable == null) {
@@ -89,11 +98,14 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of a map with the elements in the same order
+	 * as when iterating over the entry set of the supplied map.
 	 *
-	 * @param map
-	 * @param <K>
-	 * @param <V>
-	 * @return
+	 * @param map the map to create the new sequence from
+	 * @param <K> the key type of the map
+	 * @param <V> the element type of the map
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code map} is {@code null}
 	 */
 	public static <K, V> Sequence<Map.Entry<K, V>> of(Map<K, V> map) {
 		if (map == null) {
@@ -104,19 +116,24 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence whose elements are the specified values in order.
 	 *
-	 * @param array
-	 * @param <T>
-	 * @return
+	 * @param values the elements of the new sequence
+	 * @param <T> the type of the sequence elements
+	 * @return the new sequence
 	 */
-	public static <T> Sequence<T> of(T... array) {
-		return new Sequence<T>(new ArrayIterable<T>(array));
+	@SafeVarargs
+	@SuppressWarnings("varargs")
+	public static <T> Sequence<T> of(T... values) {
+		return new Sequence<T>(new ArrayIterable<T>(values));
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive booleans in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the boolean array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Boolean> of(final boolean[] array) {
 		if (array == null) {
@@ -127,9 +144,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive bytes in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the byte array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Byte> of(final byte[] array) {
 		if (array == null) {
@@ -140,9 +159,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive chars in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the char array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Character> of(final char[] array) {
 		if (array == null) {
@@ -153,9 +174,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive doubles in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the double array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Double> of(final double[] array) {
 		if (array == null) {
@@ -166,9 +189,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive floats in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the float array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Float> of(final float[] array) {
 		if (array == null) {
@@ -179,9 +204,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive ints in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the int array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Integer> of(final int[] array) {
 		if (array == null) {
@@ -192,9 +219,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive longs in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the long array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Long> of(final long[] array) {
 		if (array == null) {
@@ -205,9 +234,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence out of an array of primitive shorts in the same order.
 	 *
-	 * @param array
-	 * @return
+	 * @param array the short array to create the new sequence from
+	 * @return the new sequence
+	 * @throws IllegalArgumentException if {@code array} is {@code null}
 	 */
 	public static Sequence<Short> of(final short[] array) {
 		if (array == null) {
