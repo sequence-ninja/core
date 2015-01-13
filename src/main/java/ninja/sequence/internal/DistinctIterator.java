@@ -26,7 +26,7 @@ public class DistinctIterator<TSource> extends AbstractIterator<TSource, TSource
 				continue;
 			}
 
-			return key.value;
+			return key.getValue();
 		}
 
 		return computationEnd();
