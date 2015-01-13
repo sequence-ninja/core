@@ -14,8 +14,10 @@ public class SkipIterator<TSource> extends AbstractIterator<TSource, TSource> {
 	@Override
 	protected TSource computeNext() {
 		while (super.parent.hasNext()) {
+			TSource next = this.parent.next();
+
 			if (this.remaining == 0) {
-				return this.parent.next();
+				return next;
 			}
 
 			this.remaining--;
