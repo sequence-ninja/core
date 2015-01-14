@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ninja.sequence</groupId>
-	<artifactId>core</artifactId>
+	<artifactId>sequence-core</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<properties>
