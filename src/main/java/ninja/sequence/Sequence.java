@@ -323,14 +323,14 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * A.k.a. fold left
 	 *
-	 * @param identity
+	 * @param seed
 	 * @param accumulator
-	 * @param <TIdentity>
+	 * @param <S>
 	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
 	 * @return
 	 */
-	public final <TIdentity> TIdentity aggregate(TIdentity identity, Accumulator<TIdentity, ? super T> accumulator) {
-		return aggregate(this.source.iterator(), identity, accumulator, Funcs.<TIdentity>forward());
+	public final <S> S aggregate(S seed, Accumulator<S, ? super T> accumulator) {
+		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>forward());
 	}
 
 	/**
@@ -338,23 +338,23 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * A.k.a. fold left
 	 *
-	 * @param identity
+	 * @param seed
 	 * @param accumulator
 	 * @param map
-	 * @param <TIdentity>
-	 * @param <TResult>
+	 * @param <S>
+	 * @param <R>
 	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
 	 * @return
 	 */
-	public final <TIdentity, TResult> TResult aggregate(TIdentity identity, Accumulator<TIdentity, ? super T> accumulator, Func<TIdentity, ? extends TResult> map) {
-		return aggregate(this.source.iterator(), identity, accumulator, map);
+	public final <S, R> R aggregate(S seed, Accumulator<S, ? super T> accumulator, Func<S, ? extends R> map) {
+		return aggregate(this.source.iterator(), seed, accumulator, map);
 	}
 
-	private <TSeed, TResult> TResult aggregate(Iterator<? extends T> source, TSeed seed, Accumulator<TSeed, ? super T> accumulator, Func<TSeed, ? extends TResult> map) {
+	private <S, R> R aggregate(Iterator<? extends T> source, S seed, Accumulator<S, ? super T> accumulator, Func<S, ? extends R> map) {
 		Check.argumentNotNull(accumulator, "accumulator must not be null.");
 		Check.argumentNotNull(map, "map must not be null.");
 
-		TSeed result = seed;
+		S result = seed;
 
 		while (source.hasNext()) {
 			result = accumulator.accumulate(result, source.next());
@@ -937,16 +937,16 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param outerKeySelector
 	 * @param innerKeySelector
 	 * @param f
-	 * @param <TInner>
+	 * @param <T2>
 	 * @param <K>
 	 * @param <R>
 	 * @return
 	 */
-	public final <TInner, K, R> Sequence<R> join(Iterable<TInner> inner, final Func<? super T, ? extends K> outerKeySelector, final Func<? super TInner, ? extends K> innerKeySelector, final Func2<? super T, ? super TInner, ? extends R> f) {
-		final Map<K, GroupedSequence<K, TInner>> map = new Sequence<TInner>(inner).groupBy(innerKeySelector).asHashMap(
-			new Func<GroupedSequence<K, TInner>, K>() {
+	public final <T2, K, R> Sequence<R> join(Iterable<T2> inner, final Func<? super T, ? extends K> outerKeySelector, final Func<? super T2, ? extends K> innerKeySelector, final Func2<? super T, ? super T2, ? extends R> f) {
+		final Map<K, GroupedSequence<K, T2>> map = new Sequence<T2>(inner).groupBy(innerKeySelector).asHashMap(
+			new Func<GroupedSequence<K, T2>, K>() {
 				@Override
-				public K invoke(GroupedSequence<K, TInner> arg) {
+				public K invoke(GroupedSequence<K, T2> arg) {
 					return arg.getKey();
 				}
 			}
@@ -956,7 +956,7 @@ public class Sequence<T> implements Iterable<T> {
 			new Iterable<R>() {
 				@Override
 				public Iterator<R> iterator() {
-					return new JoinIterator<T, TInner, K, R>(source.iterator(), map, outerKeySelector, f);
+					return new JoinIterator<T, T2, K, R>(source.iterator(), map, outerKeySelector, f);
 				}
 			}
 		);
@@ -969,13 +969,13 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param innerKey
 	 * @param f
 	 * @param comparator
-	 * @param <TInner>
+	 * @param <T2>
 	 * @param <K>
 	 * @param <R>
 	 * @return
 	 */
-	public final <TInner, K, R> Sequence<R> join(Iterable<TInner> inner, Func<? super T, ? extends K> outerKey,
-											Func<? super TInner, ? extends K> innerKey, Func2<? super T, ? super TInner, ? extends R> f,
+	public final <T2, K, R> Sequence<R> join(Iterable<T2> inner, Func<? super T, ? extends K> outerKey,
+											Func<? super T2, ? extends K> innerKey, Func2<? super T, ? super T2, ? extends R> f,
 											EqualityComparator<? super K> comparator) {
 
 		return null;
@@ -1187,6 +1187,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
+	 * A.k.a head
+	 *
 	 * @param count The number of elements to skip in this sequence.
 	 * @return
 	 */
@@ -1292,25 +1294,25 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param other
-	 * @param <TOther>
+	 * @param <T2>
 	 * @return
 	 */
-	public final <TOther> Sequence<Tuple<T, TOther>> zip(TOther... other) {
+	public final <T2> Sequence<Tuple<T, T2>> zip(T2... other) {
 		return zip(array(other));
 	}
 
 	/**
 	 *
 	 * @param other
-	 * @param <TOther>
+	 * @param <T2>
 	 * @return
 	 */
-	public final <TOther> Sequence<Tuple<T, TOther>> zip(final Iterable<? extends TOther> other) {
-		return new Sequence<Tuple<T, TOther>>(
-			new Iterable<Tuple<T, TOther>>() {
+	public final <T2> Sequence<Tuple<T, T2>> zip(final Iterable<? extends T2> other) {
+		return new Sequence<Tuple<T, T2>>(
+			new Iterable<Tuple<T, T2>>() {
 				@Override
-				public Iterator<Tuple<T, TOther>> iterator() {
-					return new ZipIterator<T, TOther>(source.iterator(), other.iterator());
+				public Iterator<Tuple<T, T2>> iterator() {
+					return new ZipIterator<T, T2>(source.iterator(), other.iterator());
 				}
 			}
 		);
@@ -1320,36 +1322,36 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param other
 	 * @param f
-	 * @param <TOther>
+	 * @param <T2>
 	 * @param <R>
 	 * @return
 	 */
-	public final <TOther, R> Sequence<R> zip(Iterable<? extends TOther> other, Func2<? super T, ? super TOther, ? extends R> f) {
+	public final <T2, R> Sequence<R> zip(Iterable<? extends T2> other, Func2<? super T, ? super T2, ? extends R> f) {
 		return null;
 	}
 
 	/**
 	 *
 	 * @param other
-	 * @param <TOther>
+	 * @param <T2>
 	 * @return
 	 */
-	public final <TOther> Sequence<Tuple<Option<T>, Option<TOther>>> zipAll(TOther... other) {
+	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(T2... other) {
 		return zipAll(array(other));
 	}
 
 	/**
 	 *
 	 * @param other
-	 * @param <TOther>
+	 * @param <T2>
 	 * @return
 	 */
-	public final <TOther> Sequence<Tuple<Option<T>, Option<TOther>>> zipAll(final Iterable<? extends TOther> other) {
-		return new Sequence<Tuple<Option<T>, Option<TOther>>>(
-			new Iterable<Tuple<Option<T>, Option<TOther>>>() {
+	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(final Iterable<? extends T2> other) {
+		return new Sequence<Tuple<Option<T>, Option<T2>>>(
+			new Iterable<Tuple<Option<T>, Option<T2>>>() {
 				@Override
-				public Iterator<Tuple<Option<T>, Option<TOther>>> iterator() {
-					return new ZipAllIterator<T, TOther>(source.iterator(), other.iterator());
+				public Iterator<Tuple<Option<T>, Option<T2>>> iterator() {
+					return new ZipAllIterator<T, T2>(source.iterator(), other.iterator());
 				}
 			}
 		);
@@ -1359,11 +1361,11 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param other
 	 * @param f
-	 * @param <TOther>
+	 * @param <T2>
 	 * @param <R>
 	 * @return
 	 */
-	public final <TOther, R> Sequence<R> zipAll(Iterable<? extends TOther> other, Func2<Option<? super T>, Option<? super TOther>, ? extends R> f) {
+	public final <T2, R> Sequence<R> zipAll(Iterable<? extends T2> other, Func2<Option<? super T>, Option<? super T2>, ? extends R> f) {
 		return null;
 	}
 
