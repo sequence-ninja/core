@@ -307,7 +307,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Option<T> aggregate(Accumulator<T, ? super T> accumulator) {
-		Check.argumentNotNull(accumulator, "accumulator must not be null.");
+		if (accumulator == null) {
+			throw new IllegalArgumentException("accumulator must not be null.");
+		}
 
 		Iterator<? extends T> iterator = this.source.iterator();
 
@@ -570,6 +572,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws java.lang.IllegalArgumentException if the specified resultSelector is null
 	 * @return
 	 */
+
+	// even though the function of bind should actually return a Sequence, maybe it makes sense to return an iterable instead...
 	public final <R> Sequence<R> bind(final Func<? super T, ? extends Sequence<? extends R>> collectionSelector) {
 		Check.argumentNotNull(collectionSelector, "collectionSelector must not be null.");
 
@@ -588,12 +592,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * the Union method because the Concat<TSource>(IEnumerable<TSource>, IEnumerable<TSource>) method returns all the
 	 * original elements in the input sequences. The Union method returns only unique elements.
 	 * @param other
-	 * @throws java.lang.IllegalArgumentException if other is null
 	 * @return
 	 */
+	@SafeVarargs
+	@SuppressWarnings("varargs")
 	public final Sequence<T> concat(T... other) {
-		Check.argumentNotNull(other, "other must not be null.");
-
 		return concat(array(other));
 	}
 
@@ -651,11 +654,12 @@ public class Sequence<T> implements Iterable<T> {
 	 * The set difference of two sets is defined as the members of the first set that do not appear in the second set.
 	 * @param other An IEnumerable<T> whose elements that also occur in the first sequence will cause those elements to
 	 *              be removed of the returned sequence.
-	 * @throws java.lang.IllegalArgumentException if other is null
 	 * @return
 	 */
-	public final Sequence<T> difference(T... other) {
-		Check.argumentNotNull(other, "other must not be null.");
+	public final Sequence<T> difference(T[] other) {
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
 
 		return difference(array(other));
 	}
@@ -668,6 +672,10 @@ public class Sequence<T> implements Iterable<T> {
 	 */
 	public final Sequence<T> difference(Iterable<? extends T> other) {
 		return difference(other, new DefaultEqualityComparator<T>());
+	}
+
+	public final Sequence<T> difference(final T[] other, final EqualityComparator<? super T> comparator) {
+		return null;
 	}
 
 	/**
@@ -690,6 +698,8 @@ public class Sequence<T> implements Iterable<T> {
 			}
 		);
 	}
+
+
 
 	/**
 	 * Returns distinct elements of a sequence by using the default equality comparer to compare values.
@@ -848,8 +858,10 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws java.lang.IllegalArgumentException if other is null
 	 * @return
 	 */
-	public final Sequence<T> intersect(T... other) {
-		Check.argumentNotNull(other, "other must not be null.");
+	public final Sequence<T> intersect(T[] other) {
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
 
 		return intersect(array(other));
 	}
@@ -863,8 +875,8 @@ public class Sequence<T> implements Iterable<T> {
 		return intersect(other, new DefaultEqualityComparator<T>());
 	}
 
-	private <T> Sequence<T> create(Iterable<T> source) {
-		return new Sequence<T>(source);
+	public final Sequence<T> intersect(T[] other, final EqualityComparator<? super T> comparator) {
+		return null;
 	}
 
 	/**
@@ -931,6 +943,14 @@ public class Sequence<T> implements Iterable<T> {
 		);
 	}
 
+	private <T> Sequence<T> create(Iterable<T> source) {
+		return new Sequence<T>(source);
+	}
+
+	public final <T2, K, R> Sequence<R> join(T2[] inner, final Func<? super T, ? extends K> outerKeySelector, final Func<? super T2, ? extends K> innerKeySelector, final Func2<? super T, ? super T2, ? extends R> f) {
+		return null;
+	}
+
 	/**
 	 *
 	 * @param inner
@@ -960,6 +980,13 @@ public class Sequence<T> implements Iterable<T> {
 				}
 			}
 		);
+	}
+
+	public final <T2, K, R> Sequence<R> join(T2[] inner, Func<? super T, ? extends K> outerKey,
+											 Func<? super T2, ? extends K> innerKey, Func2<? super T, ? super T2, ? extends R> f,
+											 EqualityComparator<? super K> comparator) {
+
+		return null;
 	}
 
 	/**
@@ -1056,14 +1083,12 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 * Prepends one ore more values to a sequence.
 	 * @param other
-	 * @throws java.lang.IllegalArgumentException if other is null
 	 * @return Returns a sequence where one or more values is prepended to it.
 
 	 */
 	@SafeVarargs
+	@SuppressWarnings("varargs")
 	public final Sequence<T> prepend(T... other) {
-		Check.argumentNotNull(other, "other must not be null.");
-
 		return prepend(array(other));
 	}
 
@@ -1268,7 +1293,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param other
 	 * @return
 	 */
-	public final Sequence<T> union(T... other) {
+	public final Sequence<T> union(T[] other) {
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
+
 		return union(array(other));
 	}
 
@@ -1287,6 +1316,16 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param comparator
 	 * @return
 	 */
+	public final Sequence<T> union(T[] other, EqualityComparator<? super T> comparator) {
+		return concat(other).distinct(comparator);
+	}
+
+	/**
+	 *
+	 * @param other
+	 * @param comparator
+	 * @return
+	 */
 	public final Sequence<T> union(Iterable<? extends T> other, EqualityComparator<? super T> comparator) {
 		return concat(other).distinct(comparator);
 	}
@@ -1297,7 +1336,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param <T2>
 	 * @return
 	 */
-	public final <T2> Sequence<Tuple<T, T2>> zip(T2... other) {
+	public final <T2> Sequence<Tuple<T, T2>> zip(T2[] other) {
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
+
 		return zip(array(other));
 	}
 
@@ -1318,6 +1361,10 @@ public class Sequence<T> implements Iterable<T> {
 		);
 	}
 
+	public final <T2, R> Sequence<R> zip(T2[] other, Func2<? super T, ? super T2, ? extends R> f) {
+		return null;
+	}
+
 	/**
 	 *
 	 * @param other
@@ -1336,7 +1383,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param <T2>
 	 * @return
 	 */
-	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(T2... other) {
+	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(T2[] other) {
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
+
 		return zipAll(array(other));
 	}
 
@@ -1355,6 +1406,10 @@ public class Sequence<T> implements Iterable<T> {
 				}
 			}
 		);
+	}
+
+	public final <T2, R> Sequence<R> zipAll(T2[] other, Func2<Option<? super T>, Option<? super T2>, ? extends R> f) {
+		return null;
 	}
 
 	/**
