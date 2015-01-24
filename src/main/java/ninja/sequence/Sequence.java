@@ -12,7 +12,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.NavigableSet;
 
-import ninja.sequence.contract.Check;
 import ninja.sequence.datastructure.Tuple;
 import ninja.sequence.delegate.Accumulator;
 import ninja.sequence.delegate.EqualityComparator;
@@ -26,7 +25,7 @@ import ninja.sequence.internal.BooleanArrayIterable;
 import ninja.sequence.internal.ByteArrayIterable;
 import ninja.sequence.internal.CharArrayIterable;
 import ninja.sequence.internal.ConcatIterator;
-import ninja.sequence.internal.DifferenceIterator;
+import ninja.sequence.internal.DifferenceIterable;
 import ninja.sequence.internal.DistinctIterator;
 import ninja.sequence.internal.DoubleArrayIterable;
 import ninja.sequence.internal.FloatArrayIterable;
@@ -35,8 +34,8 @@ import ninja.sequence.internal.InvertedListIterator;
 import ninja.sequence.internal.JoinIterator;
 import ninja.sequence.internal.LongArrayIterable;
 import ninja.sequence.internal.MapIterator;
-import ninja.sequence.internal.RangeIterator;
-import ninja.sequence.internal.RepeatIterator;
+import ninja.sequence.internal.RangeIterable;
+import ninja.sequence.internal.RepeatIterable;
 import ninja.sequence.internal.SelectIterator;
 import ninja.sequence.internal.ShortArrayIterable;
 import ninja.sequence.internal.SkipIterator;
@@ -249,10 +248,13 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Creates a new Sequence of numbers within a specified range.
 	 *
-	 * @param from
-	 * @param count
-	 * @return
+	 * @param from the number to start the range from
+	 * @param count the amount of sequential numbers to generate
+	 * @return the new sequence containing the given range of numbers
+	 * @throws IllegalArgumentException if {@code count} is less than 0 or the total numbers to generate
+	 * exceeds the maximum value of an integer
 	 */
 	public static Sequence<Integer> range(final int from, final int count) {
 		if (count < 0) {
@@ -263,48 +265,40 @@ public class Sequence<T> implements Iterable<T> {
 			throw new IllegalArgumentException("The total numbers to process exceeds the maximum possible value.");
 		}
 
-		return new Sequence<Integer>(
-			new Iterable<Integer>() {
-				@Override
-				public Iterator<Integer> iterator() {
-					return new RangeIterator(count, from);
-				}
-			}
-		);
+		return new Sequence<Integer>(new RangeIterable(count, from));
 	}
 
 	/**
+	 * Creates a new Sequence containing the specified {@code value} count times.
 	 *
-	 * @param value
-	 * @param count
-	 * @param <T>
-	 * @return
+	 * @param value the value to be repeated
+	 * @param count the number of times the value shoud be repeated
+	 * @param <T> the type of the sequence elements
+	 * @return the new sequence containing the given value repeated multiple times
+	 * @throws IllegalArgumentException if {@code count} is less than 0
 	 */
 	public static <T> Sequence<T> repeat(final T value, final int count) {
 		if (count < 0) {
 			throw new IllegalArgumentException("count must be greater or equal 0.");
 		}
 
-		return new Sequence<T>(
-			new Iterable<T>() {
-				@Override
-				public Iterator<T> iterator() {
-					return new RepeatIterator<T>(value, count);
-				}
-			}
-		);
+		return new Sequence<T>(new RepeatIterable<T>(value, count));
 	}
 
 	/**
-	 * Aggregates all the elements of this sequence by calling the Accumulator one time for each element.
-	 * Passes both the element of the traversable and the aggregated value of the previous invocation of the
-	 * Accumultator. The first .... initial value
+	 * Aggregates the elements of this sequence by calling the {@code accumulator} for each element.
+	 *
+	 * If there is more than 1 element in the sequence to aggregate, the first element is taken as the seed
+	 * and is used together with the next element as the arguments to the {@code Accumulator}.
+	 * For any further iterations, the result of the previous aggregation, together with the next element
+	 * in the sequence is used as aguments to {@code Accumuator}.
 	 *
 	 * A.k.a. reduce left
 	 *
-	 * @param accumulator
+	 * @param accumulator the accumulator to aggregate the elements
 	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
-	 * @return
+	 * @return the aggregated result or the first element if this sequence holds exactly 1
+	 * element or an option of none if this sequence is empty
 	 */
 	public final Option<T> aggregate(Accumulator<T, ? super T> accumulator) {
 		if (accumulator == null) {
@@ -321,15 +315,15 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 *
+	 * Aggregates the elements of this sequence by calling the {@code accumulator} for each element.
 	 *
 	 * A.k.a. fold left
 	 *
-	 * @param seed
-	 * @param accumulator
 	 * @param <S>
+	 * @param seed the seed to be used as the initial value
+	 * @param accumulator the accumulator to aggregate the elements
 	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
-	 * @return
+	 * @return the aggregated result or the {@code seed} this sequence is empty
 	 */
 	public final <S> S aggregate(S seed, Accumulator<S, ? super T> accumulator) {
 		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>forward());
@@ -353,8 +347,13 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	private <S, R> R aggregate(Iterator<? extends T> source, S seed, Accumulator<S, ? super T> accumulator, Func<S, ? extends R> map) {
-		Check.argumentNotNull(accumulator, "accumulator must not be null.");
-		Check.argumentNotNull(map, "map must not be null.");
+		if (accumulator == null) {
+			throw new IllegalArgumentException("accumulator must not be null.");
+		}
+
+		if (map == null) {
+			throw new IllegalArgumentException("map must not be null.");
+		}
 
 		S result = seed;
 
@@ -377,7 +376,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * elements; otherwise, {@code false}
 	 */
 	public final boolean all(Predicate<? super T> predicate) {
-		Check.argumentNotNull(predicate, "predicate must not be null.");
+		if (predicate == null) {
+			throw new IllegalArgumentException("predicate must not be null.");
+		}
 
 		for (T element : this.source) {
 			if (!predicate.invoke(element)) {
@@ -427,7 +428,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return an array containing the elements of this traversable
 	 */
 	public final T[] asArray(Func<Integer, T[]> allocator) {
-		Check.argumentNotNull(allocator, "allocator must not be null.");
+		if (allocator == null) {
+			throw new IllegalArgumentException("allocator must not be null.");
+		}
 
 		ArrayList<T> list = asArrayList();
 
@@ -462,8 +465,11 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws java.lang.IllegalArgumentException if the specified collection is null
 	 * @return
 	 */
+	// TODO; rename to something like: fill
 	public final <R extends Collection<T>> R asCollection(R collection) {
-		Check.argumentNotNull(collection, "collection must not be null.");
+		if (collection == null) {
+			throw new IllegalArgumentException("collection must not be null.");
+		}
 
 		for (T element : this.source) {
 			collection.add(element);
@@ -513,7 +519,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final <E> HashSet<E> asHashSet(Func<? super T, ? extends E> valueSelector) {
-		Check.argumentNotNull(valueSelector, "valueSelector must not be null.");
+		if (valueSelector == null) {
+			throw new IllegalArgumentException("valueSelector must not be null.");
+		}
 
 		return map(valueSelector).asCollection(new HashSet<E>());
 	}
@@ -527,27 +535,37 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws java.lang.IllegalArgumentException if the specified map or keySelector is null
 	 * @return
 	 */
+	// TODO: rename to something like: fill
 	public final <K, R extends Map<K, T>> R asMap(R map, Func<? super T, ? extends K> keySelector) {
 		return asMap(map, keySelector, Funcs.<T>forward());
 	}
 
-	/**
-	 *
-	 * @param map
-	 * @param keySelector
-	 * @param elementSelector
-	 * @param <K>
-	 * @param <V>
-	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified map, keySelector or elementSelector is null
-	 * @return
-	 */
+		/**
+		 *
+		 * @param map
+		 * @param keySelector
+		 * @param elementSelector
+		 * @param <K>
+		 * @param <V>
+		 * @param <R>
+		 * @throws java.lang.IllegalArgumentException if the specified map, keySelector or elementSelector is null
+		 * @return
+		 */
+		// TODO: rename to something like: fill
 	public final <K, V, R extends Map<K, V>> R asMap(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
-		Check.argumentNotNull(map, "map must not be null.");
-		Check.argumentNotNull(keySelector, "keySelector must not be null.");
-		Check.argumentNotNull(elementSelector, "elementSelector must not be null.");
+		if (map == null) {
+			throw new IllegalArgumentException("map must not be null.");
+		}
 
-		for (T element : source) {
+		if (keySelector == null) {
+			throw new IllegalArgumentException("keySelector must not be null.");
+		}
+
+		if (elementSelector == null) {
+			throw new IllegalArgumentException("elementSelector must not be null.");
+		}
+
+		for (T element : this.source) {
 			map.put(keySelector.invoke(element), elementSelector.invoke(element));
 		}
 
@@ -575,7 +593,9 @@ public class Sequence<T> implements Iterable<T> {
 
 	// even though the function of bind should actually return a Sequence, maybe it makes sense to return an iterable instead...
 	public final <R> Sequence<R> bind(final Func<? super T, ? extends Sequence<? extends R>> collectionSelector) {
-		Check.argumentNotNull(collectionSelector, "collectionSelector must not be null.");
+		if (collectionSelector == null) {
+			throw new IllegalArgumentException("collectionSelector must not be null.");
+		}
 
 		return new Sequence<R>(
 			new Iterable<R>() {
@@ -607,7 +627,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Sequence<T> concat(final Iterable<? extends T> other) {
-		Check.argumentNotNull(other, "other must not be null.");
+		if (other == null) {
+			throw new IllegalArgumentException("other must not be null.");
+		}
 
 		return new Sequence<T>(
 			new Iterable<T>() {
@@ -686,17 +708,15 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Sequence<T> difference(final Iterable<? extends T> other, final EqualityComparator<? super T> comparator) {
-		Check.argumentNotNull(other, "other must not be null.");
-		Check.argumentNotNull(comparator, "comparator must not be null.");
+		if (other == null) {
+			throw new IllegalArgumentException("other must no be null.");
+		}
 
-		return new Sequence<T>(
-			new Iterable<T>() {
-				@Override
-				public Iterator<T> iterator() {
-					return new DifferenceIterator<T>(source.iterator(), other.iterator(), comparator);
-				}
-			}
-		);
+		if (comparator == null) {
+			throw new IllegalArgumentException("comparator must no be null.");
+		}
+
+		return new Sequence<T>(new DifferenceIterable<T>(this.source, other, comparator));
 	}
 
 
@@ -722,7 +742,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Sequence<T> distinct(final EqualityComparator<? super T> comparator) {
-		Check.argumentNotNull(comparator, "comparator must not be null.");
+		if (comparator == null) {
+			throw new IllegalArgumentException("comparator must not be null.");
+		}
 
 		return new Sequence<T>(
 			new Iterable<T>() {
@@ -811,9 +833,17 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final <K, R> Sequence<GroupedSequence<K, R>> groupBy(Func<? super T, ? extends K> keySelector, Func<? super T, ? extends R> elementSelector, EqualityComparator<? super K> comparator) {
-		Check.argumentNotNull(keySelector, "keySelector must not be null.");
-		Check.argumentNotNull(elementSelector, "elementSelector must not be null.");
-		Check.argumentNotNull(comparator, "comparator must not be null.");
+		if (keySelector == null) {
+			throw new IllegalArgumentException("keySelector must not be null.");
+		}
+
+		if (elementSelector == null) {
+			throw new IllegalArgumentException("elementSelector must not be null.");
+		}
+
+		if (comparator == null) {
+			throw new IllegalArgumentException("comparator must not be null.");
+		}
 
 		// HashMap allows to have null keys. Thats just fine for the grouping.
 		// TODO: Test this behaviour!
@@ -1098,7 +1128,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Sequence<T> prepend(final Iterable<? extends T> other) {
-		Check.argumentNotNull(other, "other must not be null.");
+		if (other == null) {
+			throw new IllegalArgumentException("other must not be null.");
+		}
 
 		return new Sequence<T>(
 			new Iterable<T>() {
@@ -1198,7 +1230,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final Sequence<T> skipWhile(final Predicate<? super T> predicate) {
-		Check.argumentNotNull(predicate, "predicate must not be null.");
+		if (predicate == null) {
+			throw new IllegalArgumentException("predicate must not be null.");
+		}
 
 		return new Sequence<T>(
 			new Iterable<T>() {

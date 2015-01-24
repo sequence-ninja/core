@@ -4,17 +4,17 @@ import java.util.Iterator;
 
 import ninja.sequence.contract.Check;
 
-public class ConcatIterator<TSource> extends AbstractIterator<TSource, TSource> {
-	private final Iterator<? extends TSource> other;
+public class ConcatIterator<T> extends AbstractIterator<T, T> {
+	private final Iterator<? extends T> other;
 
-	public ConcatIterator(Iterator<? extends TSource> first, Iterator<? extends TSource> second) {
+	public ConcatIterator(Iterator<? extends T> first, Iterator<? extends T> second) {
 		super(first);
 
 		this.other = Check.argumentNotNull(second, "second must not be null.");
 	}
 
 	@Override
-	protected TSource computeNext() {
+	protected T computeNext() {
 		if (super.parent.hasNext()) {
 			return super.parent.next();
 		}
