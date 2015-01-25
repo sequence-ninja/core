@@ -253,7 +253,7 @@
 //	public void testAsCollection() {
 //		List<Integer> integers = asList(1, 2);
 //
-//		LinkedList<Integer> actual = from(integers).asCollection(new LinkedList<Integer>());
+//		LinkedList<Integer> actual = from(integers).fill(new LinkedList<Integer>());
 //
 //		assertThat(actual).containsExactly(1, 2);
 //	}

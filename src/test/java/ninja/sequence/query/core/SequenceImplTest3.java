@@ -24,7 +24,7 @@
 //	@Test
 //	public void asCollection_returnsLinkedHashSet() {
 //		// When
-//		LinkedHashSet<String> actual = sequence(Lists.newArrayList("ninja", "hanzo")).asCollection(new LinkedHashSet<String>());
+//		LinkedHashSet<String> actual = sequence(Lists.newArrayList("ninja", "hanzo")).fill(new LinkedHashSet<String>());
 //
 //		// Then
 //		assertThat(actual).containsExactly("ninja", "hanzo");

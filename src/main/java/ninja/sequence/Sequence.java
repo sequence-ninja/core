@@ -466,27 +466,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return an {@code ArrayList} containing the elements of this sequence
 	 */
 	public final ArrayList<T> asArrayList() {
-		return asCollection(new ArrayList<T>());
-	}
-
-	/**
-	 *
-	 * @param collection
-	 * @param <R>
-	 * @return
-	 * @throws IllegalArgumentException if the specified collection is null
-	 */
-	// TODO; rename to something like: fill
-	public final <R extends Collection<T>> R asCollection(R collection) {
-		if (collection == null) {
-			throw new IllegalArgumentException("collection must not be null.");
-		}
-
-		for (T element : this.source) {
-			collection.add(element);
-		}
-
-		return collection;
+		return fill(new ArrayList<T>());
 	}
 
 	/**
@@ -511,7 +491,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws IllegalArgumentException if the specified keySelector or elementSelector is null
 	 */
 	public final <K, V> HashMap<K, V> asHashMap(Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
-		return asMap(new HashMap<K, V>(), keySelector, elementSelector);
+		return fill(new HashMap<K, V>(), keySelector, elementSelector);
 	}
 
 	/**
@@ -534,53 +514,7 @@ public class Sequence<T> implements Iterable<T> {
 			throw new IllegalArgumentException("valueSelector must not be null.");
 		}
 
-		return map(valueSelector).asCollection(new HashSet<E>());
-	}
-
-	/**
-	 *
-	 * @param map
-	 * @param keySelector
-	 * @param <K>
-	 * @param <R>
-	 * @return
-	 * @throws IllegalArgumentException if the specified map or keySelector is null
-	 */
-	// TODO: rename to something like: fill
-	public final <K, R extends Map<K, T>> R asMap(R map, Func<? super T, ? extends K> keySelector) {
-		return asMap(map, keySelector, Funcs.<T>forward());
-	}
-
-		/**
-		 *
-		 * @param map
-		 * @param keySelector
-		 * @param elementSelector
-		 * @param <K>
-		 * @param <V>
-		 * @param <R>
-		 * @return
-		 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
-		 */
-		// TODO: rename to something like: fill
-	public final <K, V, R extends Map<K, V>> R asMap(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
-		if (map == null) {
-			throw new IllegalArgumentException("map must not be null.");
-		}
-
-		if (keySelector == null) {
-			throw new IllegalArgumentException("keySelector must not be null.");
-		}
-
-		if (elementSelector == null) {
-			throw new IllegalArgumentException("elementSelector must not be null.");
-		}
-
-		for (T element : this.source) {
-			map.put(keySelector.invoke(element), elementSelector.invoke(element));
-		}
-
-		return map;
+		return map(valueSelector).fill(new HashSet<E>());
 	}
 
 	/**
@@ -765,6 +699,72 @@ public class Sequence<T> implements Iterable<T> {
 				}
 			}
 		);
+	}
+
+	/**
+	 *
+	 * @param collection
+	 * @param <R>
+	 * @return
+	 * @throws IllegalArgumentException if the specified collection is null
+	 */
+	// TODO; rename to something like: fill
+	public final <R extends Collection<T>> R fill(R collection) {
+		if (collection == null) {
+			throw new IllegalArgumentException("collection must not be null.");
+		}
+
+		for (T element : this.source) {
+			collection.add(element);
+		}
+
+		return collection;
+	}
+
+	/**
+	 *
+	 * @param map
+	 * @param keySelector
+	 * @param <K>
+	 * @param <R>
+	 * @return
+	 * @throws IllegalArgumentException if the specified map or keySelector is null
+	 */
+	// TODO: rename to something like: fill
+	public final <K, R extends Map<K, T>> R fill(R map, Func<? super T, ? extends K> keySelector) {
+		return fill(map, keySelector, Funcs.<T>forward());
+	}
+
+	/**
+	 *
+	 * @param map
+	 * @param keySelector
+	 * @param elementSelector
+	 * @param <K>
+	 * @param <V>
+	 * @param <R>
+	 * @return
+	 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
+	 */
+	// TODO: rename to something like: fill
+	public final <K, V, R extends Map<K, V>> R fill(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
+		if (map == null) {
+			throw new IllegalArgumentException("map must not be null.");
+		}
+
+		if (keySelector == null) {
+			throw new IllegalArgumentException("keySelector must not be null.");
+		}
+
+		if (elementSelector == null) {
+			throw new IllegalArgumentException("elementSelector must not be null.");
+		}
+
+		for (T element : this.source) {
+			map.put(keySelector.invoke(element), elementSelector.invoke(element));
+		}
+
+		return map;
 	}
 
 	/**

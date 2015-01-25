@@ -261,7 +261,7 @@
 //	@Test
 //	public void asCollection_collectionMustNotBeNull() {
 //		try {
-//			sequence(Lists.newArrayList("ninja")).asCollection(null);
+//			sequence(Lists.newArrayList("ninja")).fill(null);
 //			Assertions.failBecauseExceptionWasNotThrown(IllegalArgumentException.class);
 //		} catch (Exception e) {
 //			assertThat(e).isInstanceOf(IllegalArgumentException.class);
@@ -272,7 +272,7 @@
 //	@Test
 //	public void asCollection_returnsLinkedHashSet() {
 //		// When
-//		LinkedHashSet<String> actual = sequence(Lists.newArrayList("ninja", "hanzo")).asCollection(new LinkedHashSet<String>());
+//		LinkedHashSet<String> actual = sequence(Lists.newArrayList("ninja", "hanzo")).fill(new LinkedHashSet<String>());
 //
 //		// Then
 //		assertThat(actual).containsExactly("ninja", "hanzo");
