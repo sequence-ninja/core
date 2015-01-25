@@ -83,8 +83,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * Creates a new Sequence out of an iterable with the elements in the same
 	 * order as when iterating over the iterable.
 	 *
-	 * @param iterable the iterable to create the new sequence from
 	 * @param <T> the type of the sequence elements
+	 * @param iterable the iterable to create the new sequence from
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code iterable} is {@code null}
 	 */
@@ -100,9 +100,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * Creates a new Sequence out of a map with the elements in the same order
 	 * as when iterating over the entry set of the supplied map.
 	 *
-	 * @param map the map to create the new sequence from
 	 * @param <K> the key type of the map
 	 * @param <V> the element type of the map
+	 * @param map the map to create the new sequence from
 	 * @return the new sequence
 	 * @throws IllegalArgumentException if {@code map} is {@code null}
 	 */
@@ -117,8 +117,8 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 * Creates a new Sequence whose elements are the specified values in order.
 	 *
-	 * @param values the elements of the new sequence
 	 * @param <T> the type of the sequence elements
+	 * @param values the elements of the new sequence
 	 * @return the new sequence
 	 */
 	@SafeVarargs
@@ -254,7 +254,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param count the amount of sequential numbers to generate
 	 * @return the new sequence containing the given range of numbers
 	 * @throws IllegalArgumentException if {@code count} is less than 0 or the total numbers to generate
-	 * exceeds the maximum value of an integer
+	 *                                  exceeds the maximum value of an integer
 	 */
 	public static Sequence<Integer> range(final int from, final int count) {
 		if (count < 0) {
@@ -269,11 +269,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Creates a new Sequence containing the specified {@code value} count times.
+	 * Creates a new Sequence containing the specified {@code value} repeatedly.
 	 *
+	 * @param <T> the type of the sequence elements
 	 * @param value the value to be repeated
 	 * @param count the number of times the value shoud be repeated
-	 * @param <T> the type of the sequence elements
 	 * @return the new sequence containing the given value repeated multiple times
 	 * @throws IllegalArgumentException if {@code count} is less than 0
 	 */
@@ -296,9 +296,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * A.k.a. reduce left
 	 *
 	 * @param accumulator the accumulator to aggregate the elements
-	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
 	 * @return the aggregated result or the first element if this sequence holds exactly 1
-	 * element or an option of none if this sequence is empty
+	 *         element or an option of none if this sequence is empty
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
 	 */
 	public final Option<T> aggregate(Accumulator<T, ? super T> accumulator) {
 		if (accumulator == null) {
@@ -316,31 +316,35 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 * Aggregates the elements of this sequence by calling the {@code accumulator} for each element.
+	 * The specified {@code seed} is the value used as the initial value for the accumulator.
 	 *
 	 * A.k.a. fold left
 	 *
-	 * @param <S>
-	 * @param seed the seed to be used as the initial value
+	 * @param <S> the type of the seed
+	 * @param seed the value used as the initial value
 	 * @param accumulator the accumulator to aggregate the elements
-	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
-	 * @return the aggregated result or the {@code seed} this sequence is empty
+	 * @return the aggregated result or the {@code seed} if this sequence is empty
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
 	 */
 	public final <S> S aggregate(S seed, Accumulator<S, ? super T> accumulator) {
 		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>forward());
 	}
 
 	/**
-	 *
+	 * Aggregates the elements of this sequence by calling the {@code accumulator} for each element and
+	 * maps the final result.
+	 * The specified {@code seed} is the value used as the initial value for the accumulator.
 	 *
 	 * A.k.a. fold left
 	 *
-	 * @param seed
-	 * @param accumulator
-	 * @param map
-	 * @param <S>
-	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified accumulator is null
-	 * @return
+	 * @param <S> the type of the seed
+	 * @param <R> the type of the result
+	 * @param seed the value used as the initial value
+	 * @param accumulator the accumulator to aggregate the elements
+	 * @param map the mapping function used to map the final aggregated result
+	 * @return the aggregated and mapped result or the mapped {@code seed} if this sequence is empty
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
+	 * @throws IllegalArgumentException if the specified {@code map} function is null
 	 */
 	public final <S, R> R aggregate(S seed, Accumulator<S, ? super T> accumulator, Func<S, ? extends R> map) {
 		return aggregate(this.source.iterator(), seed, accumulator, map);
@@ -365,15 +369,17 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Determines whether all elements of this traversable satisfy a condition.
+	 * Determines whether all elements of this sequence satisfy a condition.
 	 * The iteration is stopped as soon as the result can be determined, e.g. first
 	 * element found that does not satsify the condition.
 	 *
-	 * @param predicate A function to test each element for a condition.
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
+	 * A.k.a. every
+	 *
+	 * @param predicate a function to test each element for a condition.
 	 * @return {@code true} if every element of this sequence passes the test
-	 * in the specified predicate, or if this traversable does not contain any
-	 * elements; otherwise, {@code false}
+	 *         in the specified predicate, or if this sequence does not contain any
+	 *         elements; otherwise, {@code false}
+	 * @throws IllegalArgumentException if the specified predicate is null
 	 */
 	public final boolean all(Predicate<? super T> predicate) {
 		if (predicate == null) {
@@ -390,10 +396,10 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Determines whether this traversable contains any elements. The iteration
+	 * Determines whether this sequence contains any elements. The iteration
 	 * is stopped as soon as the result can be determined.
 	 *
-	 * A.k.a. contains
+	 * A.k.a. isEmpty
 	 *
 	 * @return true if this sequence contains any elements; otherwise, false.
 	 */
@@ -406,26 +412,29 @@ public class Sequence<T> implements Iterable<T> {
 	 * stopped as soon as the result can be determined, e.g. first element
 	 * found that does satisfy the condition.
 	 *
+	 * A.k.a. contains
+	 *
 	 * @param predicate A function to test each element for a condition.
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
 	 * @return true if this traversable contains any elements; otherwise, false.
+	 * @throws IllegalArgumentException if the specified predicate is null
 	 */
 	public final boolean any(Predicate<? super T> predicate) {
 		return select(predicate).any();
 	}
 
 	/**
-	 * Returns an array containing all the elements of this traversable in proper
-	 * sequence. The query is immediatly evaluated.
+	 * Returns an array containing all the elements of this sequence in proper
+	 * order.
+	 *
+	 * The query is immediatly evaluated.
 	 *
 	 * @param allocator A function that provides the length of this sequence, to produce a new
 	 *                  array of the given type.
-	 * @throws java.lang.IllegalArgumentException if the specified function is null
-	 * @throws java.lang.NullPointerException if the resulting array of the function
-	 * is null
-	 * @throws java.lang.UnsupportedOperationException if the length of the resulting
-	 * array of the function is less then the amount elements of this traversable
 	 * @return an array containing the elements of this traversable
+	 * @throws IllegalArgumentException if the specified function is null
+	 * @throws NullPointerException if the resulting array of the function is null
+	 * @throws UnsupportedOperationException if the length of the resulting array of the function
+	 *                                       is less then the amount elements of this sequence
 	 */
 	public final T[] asArray(Func<Integer, T[]> allocator) {
 		if (allocator == null) {
@@ -449,10 +458,12 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns an {@code ArrayList} containing all the elements of this traversable
-	 * in proper sequence. The query is immediatly evaluated.
+	 * Returns a new {@code ArrayList} containing all the elements of this sequence
+	 * in proper order.
 	 *
-	 * @return an {@code ArrayList} containing the elements of this traversable
+	 * The query is immediatly evaluated.
+	 *
+	 * @return an {@code ArrayList} containing the elements of this sequence
 	 */
 	public final ArrayList<T> asArrayList() {
 		return asCollection(new ArrayList<T>());
@@ -462,8 +473,8 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param collection
 	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified collection is null
 	 * @return
+	 * @throws IllegalArgumentException if the specified collection is null
 	 */
 	// TODO; rename to something like: fill
 	public final <R extends Collection<T>> R asCollection(R collection) {
@@ -479,12 +490,12 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns a {@code HashMap} according to the specified key selector function.
+	 * Returns a new {@code HashMap} according to the specified key selector function.
 	 *
-	 * @param keySelector A function to extract the key of an element
 	 * @param <K> The type of the key
-	 * @throws java.lang.IllegalArgumentException if the specified keySelector is null
+	 * @param keySelector a function to extract the key of an element
 	 * @return a {@code HashMap} containing ... key and its element....
+	 * @throws IllegalArgumentException if the specified keySelector is null
 	 */
 	public final <K> HashMap<K, T> asHashMap(Func<? super T, ? extends K> keySelector) {
 		return asHashMap(keySelector, Funcs.<T>forward());
@@ -496,8 +507,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param elementSelector
 	 * @param <K>
 	 * @param <V>
-	 * @throws java.lang.IllegalArgumentException if the specified keySelector or elementSelector is null
 	 * @return
+	 * @throws IllegalArgumentException if the specified keySelector or elementSelector is null
 	 */
 	public final <K, V> HashMap<K, V> asHashMap(Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
 		return asMap(new HashMap<K, V>(), keySelector, elementSelector);
@@ -515,8 +526,8 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param valueSelector
 	 * @param <E>
-	 * @throws java.lang.IllegalArgumentException if the specified keySelector is null
 	 * @return
+	 * @throws IllegalArgumentException if the specified keySelector is null
 	 */
 	public final <E> HashSet<E> asHashSet(Func<? super T, ? extends E> valueSelector) {
 		if (valueSelector == null) {
@@ -532,8 +543,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param keySelector
 	 * @param <K>
 	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified map or keySelector is null
 	 * @return
+	 * @throws IllegalArgumentException if the specified map or keySelector is null
 	 */
 	// TODO: rename to something like: fill
 	public final <K, R extends Map<K, T>> R asMap(R map, Func<? super T, ? extends K> keySelector) {
@@ -548,8 +559,8 @@ public class Sequence<T> implements Iterable<T> {
 		 * @param <K>
 		 * @param <V>
 		 * @param <R>
-		 * @throws java.lang.IllegalArgumentException if the specified map, keySelector or elementSelector is null
 		 * @return
+		 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
 		 */
 		// TODO: rename to something like: fill
 	public final <K, V, R extends Map<K, V>> R asMap(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
@@ -587,8 +598,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * A.k.a. flat, flatMap, flatten
 	 * @param collectionSelector
 	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified resultSelector is null
 	 * @return
+	 * @throws IllegalArgumentException if the specified resultSelector is null
 	 */
 
 	// even though the function of bind should actually return a Sequence, maybe it makes sense to return an iterable instead...
@@ -623,8 +634,8 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param other
-	 * @throws java.lang.IllegalArgumentException if other is null
 	 * @return
+	 * @throws IllegalArgumentException if other is null
 	 */
 	public final Sequence<T> concat(final Iterable<? extends T> other) {
 		if (other == null) {
@@ -665,8 +676,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * Returns the number of elements in this traversable that satisifes a condition.
 	 *
 	 * @param predicate A function to test each element for a condition
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
 	 * @return the number of elements in this traversable that satisifes a condition
+	 * @throws IllegalArgumentException if the specified predicate is null
 	 */
 	public final long count(final Predicate<? super T> predicate) {
 		return select(predicate).count();
@@ -689,7 +700,7 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param other
-	 * @throws java.lang.IllegalArgumentException if other is null
+	 * @throws IllegalArgumentException if other is null
 	 * @return
 	 */
 	public final Sequence<T> difference(Iterable<? extends T> other) {
@@ -704,7 +715,7 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param other
 	 * @param comparator
-	 * @throws java.lang.IllegalArgumentException if other or the comparator is null
+	 * @throws IllegalArgumentException if other or the comparator is null
 	 * @return
 	 */
 	public final Sequence<T> difference(final Iterable<? extends T> other, final EqualityComparator<? super T> comparator) {
@@ -738,7 +749,7 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param comparator
-	 * @throws java.lang.IllegalArgumentException if the comparator is null
+	 * @throws IllegalArgumentException if the comparator is null
 	 * @return
 	 */
 	public final Sequence<T> distinct(final EqualityComparator<? super T> comparator) {
@@ -885,7 +896,7 @@ public class Sequence<T> implements Iterable<T> {
 	 and Equals methods for the type.
 
 	 * @param other
-	 * @throws java.lang.IllegalArgumentException if other is null
+	 * @throws IllegalArgumentException if other is null
 	 * @return
 	 */
 	public final Sequence<T> intersect(T[] other) {
@@ -905,15 +916,21 @@ public class Sequence<T> implements Iterable<T> {
 		return intersect(other, new DefaultEqualityComparator<T>());
 	}
 
+	/**
+	 *
+	 * @param other
+	 * @param comparator
+	 * @return
+	 */
 	public final Sequence<T> intersect(T[] other, final EqualityComparator<? super T> comparator) {
-		return null;
+		return intersect(array(other), comparator);
 	}
 
 	/**
 	 *
 	 * @param other
 	 * @param comparator
-	 * @throws java.lang.IllegalArgumentException if other or the comparator is null
+	 * @throws IllegalArgumentException if other or the comparator is null
 	 * @return
 	 */
 	public final Sequence<T> intersect(Iterable<? extends T> other, final EqualityComparator<? super T> comparator) {
@@ -977,19 +994,30 @@ public class Sequence<T> implements Iterable<T> {
 		return new Sequence<T>(source);
 	}
 
-	public final <T2, K, R> Sequence<R> join(T2[] inner, final Func<? super T, ? extends K> outerKeySelector, final Func<? super T2, ? extends K> innerKeySelector, final Func2<? super T, ? super T2, ? extends R> f) {
-		return null;
-	}
-
 	/**
 	 *
+	 * @param <T2>
+	 * @param <K>
+	 * @param <R>
 	 * @param inner
 	 * @param outerKeySelector
 	 * @param innerKeySelector
 	 * @param f
+	 * @return
+	 */
+	public final <T2, K, R> Sequence<R> join(T2[] inner, Func<? super T, ? extends K> outerKeySelector, Func<? super T2, ? extends K> innerKeySelector, Func2<? super T, ? super T2, ? extends R> f) {
+		return join(array(inner), outerKeySelector, innerKeySelector, f);
+	}
+
+	/**
+	 *
 	 * @param <T2>
 	 * @param <K>
 	 * @param <R>
+	 * @param inner
+	 * @param outerKeySelector
+	 * @param innerKeySelector
+	 * @param f
 	 * @return
 	 */
 	public final <T2, K, R> Sequence<R> join(Iterable<T2> inner, final Func<? super T, ? extends K> outerKeySelector, final Func<? super T2, ? extends K> innerKeySelector, final Func2<? super T, ? super T2, ? extends R> f) {
@@ -1012,23 +1040,35 @@ public class Sequence<T> implements Iterable<T> {
 		);
 	}
 
-	public final <T2, K, R> Sequence<R> join(T2[] inner, Func<? super T, ? extends K> outerKey,
-											 Func<? super T2, ? extends K> innerKey, Func2<? super T, ? super T2, ? extends R> f,
-											 EqualityComparator<? super K> comparator) {
-
-		return null;
-	}
-
 	/**
 	 *
+	 * @param <T2>
+	 * @param <K>
+	 * @param <R>
 	 * @param inner
 	 * @param outerKey
 	 * @param innerKey
 	 * @param f
 	 * @param comparator
+	 * @return
+	 */
+	public final <T2, K, R> Sequence<R> join(T2[] inner, Func<? super T, ? extends K> outerKey,
+											 Func<? super T2, ? extends K> innerKey, Func2<? super T, ? super T2, ? extends R> f,
+											 EqualityComparator<? super K> comparator) {
+
+		return join(array(inner), outerKey, innerKey, f, comparator);
+	}
+
+	/**
+	 *
 	 * @param <T2>
 	 * @param <K>
 	 * @param <R>
+	 * @param inner
+	 * @param outerKey
+	 * @param innerKey
+	 * @param f
+	 * @param comparator
 	 * @return
 	 */
 	public final <T2, K, R> Sequence<R> join(Iterable<T2> inner, Func<? super T, ? extends K> outerKey,
@@ -1094,9 +1134,9 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * In query expression syntax, a select (Visual C#) or Select (Visual Basic) clause translates to an invocation of Select.
 	 *
-	 * @param resultSelector
 	 * @param <R>
-	 * @throws java.lang.IllegalArgumentException if the specified resultSelector is null
+	 * @param resultSelector
+	 * @throws IllegalArgumentException if the specified resultSelector is null
 	 * @return
 	 */
 	public final <R> Sequence<R> map(final Func<? super T, ? extends R> resultSelector) {
@@ -1146,7 +1186,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * Inverts the order of the elements in a sequence. Unlike OrderBy, this sorting method does not consider the actual
 	 * values themselves in determining the order. Rather, it just returns the elements in the reverse order of which they are produced by the underlying source.
 
-	 * @throws java.lang.IllegalArgumentException if other is null
+	 * @throws IllegalArgumentException if other is null
 	 * @return A sequence whose elements correspond to those of the input sequence in reverse order.
 	 */
 	public final Sequence<T> reverse() {
@@ -1209,6 +1249,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
+	 * A.k.a. offset
+	 *
 	 * @param count The number of elements to skip in this sequence.
 	 * @return
 	 */
@@ -1226,7 +1268,7 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param predicate
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
+	 * @throws IllegalArgumentException if the specified predicate is null
 	 * @return
 	 */
 	public final Sequence<T> skipWhile(final Predicate<? super T> predicate) {
@@ -1265,7 +1307,7 @@ public class Sequence<T> implements Iterable<T> {
 	/**
 	 *
 	 * @param predicate
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
+	 * @throws IllegalArgumentException if the specified predicate is null
 	 * @return
 	 */
 	public final Sequence<T> takeWhile(final Predicate<? super T> predicate) {
@@ -1281,9 +1323,11 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param keySelector
+	 * A.k.a. orderBy
+	 *
 	 * @param <K>
-	 * @throws java.lang.IllegalArgumentException if the specified keySelector is null
+	 * @param keySelector
+	 * @throws IllegalArgumentException if the specified keySelector is null
 	 * @return
 	 */
 	public final <K> SortedSequence<T, K> sortBy(Func<? super T, ? extends K> keySelector) {
@@ -1292,9 +1336,11 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
+	 * A.k.a. orderBy
+	 *
+	 * @param <K>
 	 * @param keySelector
 	 * @param comparator
-	 * @param <K>
 	 * @return
 	 */
 	public final <K> SortedSequence<T, K> sortBy(Func<? super T, ? extends K> keySelector, Comparator<? super K> comparator) {
@@ -1303,8 +1349,10 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param keySelector
+	 * A.k.a. orderByDescending
+	 *
 	 * @param <K>
+	 * @param keySelector
 	 * @return
 	 */
 	public final <K> SortedSequence<T, K> sortByDescending(Func<? super T, ? extends K> keySelector) {
@@ -1313,9 +1361,11 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
+	 * A.k.a. orderByDescending
+	 *
+	 * @param <K>
 	 * @param keySelector
 	 * @param comparator
-	 * @param <K>
 	 * @return
 	 */
 	public final <K> SortedSequence<T, K> sortByDescending(Func<? super T, ? extends K> keySelector, Comparator<? super K> comparator) {
@@ -1366,8 +1416,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param other
 	 * @param <T2>
+	 * @param other
 	 * @return
 	 */
 	public final <T2> Sequence<Tuple<T, T2>> zip(T2[] other) {
@@ -1380,8 +1430,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param other
 	 * @param <T2>
+	 * @param other
 	 * @return
 	 */
 	public final <T2> Sequence<Tuple<T, T2>> zip(final Iterable<? extends T2> other) {
@@ -1395,16 +1445,24 @@ public class Sequence<T> implements Iterable<T> {
 		);
 	}
 
+	/**
+	 *
+	 * @param <T2>
+	 * @param <R>
+	 * @param other
+	 * @param f
+	 * @return
+	 */
 	public final <T2, R> Sequence<R> zip(T2[] other, Func2<? super T, ? super T2, ? extends R> f) {
-		return null;
+		return zip(array(other), f);
 	}
 
 	/**
 	 *
-	 * @param other
-	 * @param f
 	 * @param <T2>
 	 * @param <R>
+	 * @param other
+	 * @param f
 	 * @return
 	 */
 	public final <T2, R> Sequence<R> zip(Iterable<? extends T2> other, Func2<? super T, ? super T2, ? extends R> f) {
@@ -1413,8 +1471,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param other
 	 * @param <T2>
+	 * @param other
 	 * @return
 	 */
 	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(T2[] other) {
@@ -1427,8 +1485,8 @@ public class Sequence<T> implements Iterable<T> {
 
 	/**
 	 *
-	 * @param other
 	 * @param <T2>
+	 * @param other
 	 * @return
 	 */
 	public final <T2> Sequence<Tuple<Option<T>, Option<T2>>> zipAll(final Iterable<? extends T2> other) {
@@ -1442,22 +1500,29 @@ public class Sequence<T> implements Iterable<T> {
 		);
 	}
 
+	/**
+	 *
+	 * @param <T2>
+	 * @param <R>
+	 * @param other
+	 * @param f
+	 * @return
+	 */
 	public final <T2, R> Sequence<R> zipAll(T2[] other, Func2<Option<? super T>, Option<? super T2>, ? extends R> f) {
 		return null;
 	}
 
 	/**
 	 *
-	 * @param other
-	 * @param f
 	 * @param <T2>
 	 * @param <R>
+	 * @param other
+	 * @param f
 	 * @return
 	 */
 	public final <T2, R> Sequence<R> zipAll(Iterable<? extends T2> other, Func2<Option<? super T>, Option<? super T2>, ? extends R> f) {
 		return null;
 	}
-
 
 	@Override
 	public Iterator<T> iterator() {
