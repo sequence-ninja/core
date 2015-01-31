@@ -298,7 +298,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param accumulator the accumulator to aggregate the elements
 	 * @return the aggregated result or the first element if this sequence holds exactly 1
 	 *         element or an option of none if this sequence is empty
-	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is {@code null}
 	 */
 	public final Option<T> aggregate(Accumulator<T, ? super T> accumulator) {
 		if (accumulator == null) {
@@ -324,7 +324,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param seed the value used as the initial value
 	 * @param accumulator the accumulator to aggregate the elements
 	 * @return the aggregated result or the {@code seed} if this sequence is empty
-	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is {@code null}
 	 */
 	public final <S> S aggregate(S seed, Accumulator<S, ? super T> accumulator) {
 		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>forward());
@@ -343,8 +343,8 @@ public class Sequence<T> implements Iterable<T> {
 	 * @param accumulator the accumulator to aggregate the elements
 	 * @param map the mapping function used to map the final aggregated result
 	 * @return the aggregated and mapped result or the mapped {@code seed} if this sequence is empty
-	 * @throws IllegalArgumentException if the specified {@code accumulator} function is null
-	 * @throws IllegalArgumentException if the specified {@code map} function is null
+	 * @throws IllegalArgumentException if the specified {@code accumulator} function is {@code null}
+	 * @throws IllegalArgumentException if the specified {@code map} function is {@code null}
 	 */
 	public final <S, R> R aggregate(S seed, Accumulator<S, ? super T> accumulator, Func<S, ? extends R> map) {
 		return aggregate(this.source.iterator(), seed, accumulator, map);
@@ -379,7 +379,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return {@code true} if every element of this sequence passes the test
 	 *         in the specified predicate, or if this sequence does not contain any
 	 *         elements; otherwise, {@code false}
-	 * @throws IllegalArgumentException if the specified predicate is null
+	 * @throws IllegalArgumentException if the specified predicate is {@code null}
 	 */
 	public final boolean all(Predicate<? super T> predicate) {
 		if (predicate == null) {
@@ -416,7 +416,7 @@ public class Sequence<T> implements Iterable<T> {
 	 *
 	 * @param predicate A function to test each element for a condition.
 	 * @return true if this traversable contains any elements; otherwise, false.
-	 * @throws IllegalArgumentException if the specified predicate is null
+	 * @throws IllegalArgumentException if the specified predicate is {@code null}
 	 */
 	public final boolean any(Predicate<? super T> predicate) {
 		return select(predicate).any();
@@ -426,13 +426,13 @@ public class Sequence<T> implements Iterable<T> {
 	 * Returns an array containing all the elements of this sequence in proper
 	 * order.
 	 *
-	 * The query is immediatly evaluated.
+	 * The result is immediatly evaluated.
 	 *
 	 * @param allocator A function that provides the length of this sequence, to produce a new
 	 *                  array of the given type.
 	 * @return an array containing the elements of this traversable
-	 * @throws IllegalArgumentException if the specified function is null
-	 * @throws NullPointerException if the resulting array of the function is null
+	 * @throws IllegalArgumentException if the specified function is {@code null}
+	 * @throws NullPointerException if the resulting array of the function is {@code null}
 	 * @throws UnsupportedOperationException if the length of the resulting array of the function
 	 *                                       is less then the amount elements of this sequence
 	 */
@@ -458,10 +458,10 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns a new {@code ArrayList} containing all the elements of this sequence
-	 * in proper order.
+	 * Returns a new {@code ArrayList} containing all the elements of this
+	 * sequence in proper order.
 	 *
-	 * The query is immediatly evaluated.
+	 * The result is immediatly evaluated.
 	 *
 	 * @return an {@code ArrayList} containing the elements of this sequence
 	 */
@@ -470,44 +470,62 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns a new {@code HashMap} according to the specified key selector function.
+	 * Returns a new {@code HashMap} with the keys provided by {@code keySelector}
+	 * and the correspondig element of this sequence.
+	 *
+	 * The result is immediatly evaluated.
 	 *
 	 * @param <K> The type of the key
-	 * @param keySelector a function to extract the key of an element
-	 * @return a {@code HashMap} containing ... key and its element....
-	 * @throws IllegalArgumentException if the specified keySelector is null
+	 * @param keySelector A function to extract the key of an element
+	 * @return a {@code HashMap} containing the extracted keys and their
+	 * correspondig values
+	 * @throws IllegalArgumentException if the specified keySelector is {@code null}
 	 */
 	public final <K> HashMap<K, T> asHashMap(Func<? super T, ? extends K> keySelector) {
 		return asHashMap(keySelector, Funcs.<T>forward());
 	}
 
 	/**
+	 * Returns a new {@code HashMap} with the keys provided by {@code keySelector}
+	 * and the correspondig element provided by {@code elementSelector}.
 	 *
-	 * @param keySelector
-	 * @param elementSelector
-	 * @param <K>
-	 * @param <V>
-	 * @return
-	 * @throws IllegalArgumentException if the specified keySelector or elementSelector is null
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <K> The type of the key
+	 * @param <V> The type of the element
+	 * @param keySelector A function to extract the key of an element
+	 * @param elementSelector A function to produce the resulting element from the
+	 *                        given element
+	 * @return a {@code HashMap} containing the extracted keys and the their
+	 * corresponding transformed elements
+	 * @throws IllegalArgumentException if either specified keySelector or elementSelector is {@code null}
 	 */
 	public final <K, V> HashMap<K, V> asHashMap(Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
 		return fill(new HashMap<K, V>(), keySelector, elementSelector);
 	}
 
 	/**
+	 * Returns a new {@code HashSet} with the set of all elements of this sequence.
 	 *
-	 * @return
+	 * The result is immediatly evaluated.
+	 *
+	 * @return a {@code HashSet} containing the set of all elements of this sequence
 	 */
 	public final HashSet<T> asHashSet() {
 		return asHashSet(Funcs.<T>forward());
 	}
 
 	/**
+	 * Returns a new {@code HashSet} with the set of the provided elements
+	 * provided by {@code valueSelector}.
 	 *
-	 * @param valueSelector
-	 * @param <E>
-	 * @return
-	 * @throws IllegalArgumentException if the specified keySelector is null
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <E> The type of the element
+	 * @param valueSelector A function to produce the resulting element from the
+	 *                      given element
+	 * @return a {@code HashSet} containing the set of the transformed elements
+	 * @throws IllegalArgumentException if the specified valueSelector is {@code null}
 	 */
 	public final <E> HashSet<E> asHashSet(Func<? super T, ? extends E> valueSelector) {
 		if (valueSelector == null) {
@@ -518,18 +536,9 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Projects each element of a sequence to an IEnumerable<T> and flattens the resulting sequences into one sequence.
-	 * The SelectMany<TSource, TResult>(IEnumerable<TSource>, Func<TSource, IEnumerable<TResult>>) method enumerates
-	 * the input sequence, uses a transform function to map each element to an IEnumerable<T>, and then enumerates and
-	 * yields the elements of each such IEnumerable<T> object. That is, for each element of source, selector is invoked
-	 * and a sequence of values is returned. SelectMany<TSource, TResult>(IEnumerable<TSource>, Func<TSource, IEnumerable<TResult>>)
-	 * then flattens this two-dimensional collection of collections into a one-dimensional IEnumerable<T> and returns it.
-	 * For example, if a query uses SelectMany<TSource, TResult>(IEnumerable<TSource>, Func<TSource, IEnumerable<TResult>>)
-	 * to obtain the orders (of type Order) for each customer in a database, the result is of type IEnumerable<Order> in
-	 * C# or IEnumerable(Of Order) in Visual Basic. If instead the query uses Select to obtain the orders, the collection
-	 * of collections of orders is not combined and the result is of type IEnumerable<List<Order>> in C# or I
-	 * Enumerable(Of List(Of Order)) in Visual Basic.
+	 *
 	 * A.k.a. flat, flatMap, flatten
+	 *
 	 * @param collectionSelector
 	 * @param <R>
 	 * @return
@@ -587,9 +596,11 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns the number of elements in this traversable.
+	 * Returns the number of elements in this sequence.
 	 *
-	 * @return the number of elements in this traversable
+	 * The result is immediatly evaluated.
+	 *
+	 * @return the number of elements in this sequence
 	 */
 	public final long count() {
 		if (this.source instanceof Collection) {
@@ -607,11 +618,13 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns the number of elements in this traversable that satisifes a condition.
+	 * Returns the number of elements in this sequence that satisifes a condition.
+	 *
+	 * The result is immediatly evaluated.
 	 *
 	 * @param predicate A function to test each element for a condition
-	 * @return the number of elements in this traversable that satisifes a condition
-	 * @throws IllegalArgumentException if the specified predicate is null
+	 * @return the number of elements in this sequence that satisifes a condition
+	 * @throws IllegalArgumentException if the specified predicate is {@code null}
 	 */
 	public final long count(final Predicate<? super T> predicate) {
 		return select(predicate).count();
@@ -663,8 +676,6 @@ public class Sequence<T> implements Iterable<T> {
 
 		return new Sequence<T>(new DifferenceIterable<T>(this.source, other, comparator));
 	}
-
-
 
 	/**
 	 * Returns distinct elements of a sequence by using the default equality comparer to compare values.
