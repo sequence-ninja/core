@@ -311,7 +311,7 @@ public class Sequence<T> implements Iterable<T> {
 			return Option.none();
 		}
 
-		return Option.some(aggregate(iterator, iterator.next(), accumulator, Funcs.<T>forward()));
+		return Option.some(aggregate(iterator, iterator.next(), accumulator, Funcs.<T>self()));
 	}
 
 	/**
@@ -327,7 +327,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws IllegalArgumentException if the specified {@code accumulator} function is {@code null}
 	 */
 	public final <S> S aggregate(S seed, Accumulator<S, ? super T> accumulator) {
-		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>forward());
+		return aggregate(this.source.iterator(), seed, accumulator, Funcs.<S>self());
 	}
 
 	/**
@@ -482,7 +482,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws IllegalArgumentException if the specified keySelector is {@code null}
 	 */
 	public final <K> HashMap<K, T> asHashMap(Func<? super T, ? extends K> keySelector) {
-		return asHashMap(keySelector, Funcs.<T>forward());
+		return asHashMap(keySelector, Funcs.<T>self());
 	}
 
 	/**
@@ -512,7 +512,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return a {@code HashSet} containing the set of all elements of this sequence
 	 */
 	public final HashSet<T> asHashSet() {
-		return asHashSet(Funcs.<T>forward());
+		return asHashSet(Funcs.<T>self());
 	}
 
 	/**
@@ -743,7 +743,7 @@ public class Sequence<T> implements Iterable<T> {
 	 */
 	// TODO: rename to something like: fill
 	public final <K, R extends Map<K, T>> R fill(R map, Func<? super T, ? extends K> keySelector) {
-		return fill(map, keySelector, Funcs.<T>forward());
+		return fill(map, keySelector, Funcs.<T>self());
 	}
 
 	/**
@@ -830,7 +830,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return
 	 */
 	public final <K> Sequence<GroupedSequence<K, T>> groupBy(Func<? super T, ? extends K> keySelector, EqualityComparator<? super K> comparator) {
-		return groupBy(keySelector, Funcs.<T>forward(), comparator);
+		return groupBy(keySelector, Funcs.<T>self(), comparator);
 	}
 
 	/**

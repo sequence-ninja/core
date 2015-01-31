@@ -3,7 +3,7 @@ package ninja.sequence.util;
 import ninja.sequence.delegate.Func;
 
 public abstract class Funcs {
-	private static final Func<Object, Object> FORWARD = new Func<Object, Object>() {
+	private static final Func<Object, Object> SELF = new Func<Object, Object>() {
 		@Override
 		public Object invoke(Object object) {
 			return object;
@@ -19,7 +19,7 @@ public abstract class Funcs {
 	 * @return the func
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Func<T, T> forward() {
-		return (Func<T, T>)FORWARD;
+	public static <T> Func<T, T> self() {
+		return (Func<T, T>) SELF;
 	}
 }
