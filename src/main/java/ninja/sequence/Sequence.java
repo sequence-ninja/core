@@ -466,7 +466,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @return an {@code ArrayList} containing the elements of this sequence
 	 */
 	public final ArrayList<T> asArrayList() {
-		return fill(new ArrayList<T>());
+		return collect(new ArrayList<T>());
 	}
 
 	/**
@@ -501,7 +501,7 @@ public class Sequence<T> implements Iterable<T> {
 	 * @throws IllegalArgumentException if either specified keySelector or elementSelector is {@code null}
 	 */
 	public final <K, V> HashMap<K, V> asHashMap(Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
-		return fill(new HashMap<K, V>(), keySelector, elementSelector);
+		return collect(new HashMap<K, V>(), keySelector, elementSelector);
 	}
 
 	/**
@@ -532,7 +532,7 @@ public class Sequence<T> implements Iterable<T> {
 			throw new IllegalArgumentException("valueSelector must not be null.");
 		}
 
-		return map(valueSelector).fill(new HashSet<E>());
+		return map(valueSelector).collect(new HashSet<E>());
 	}
 
 	/**
@@ -560,6 +560,82 @@ public class Sequence<T> implements Iterable<T> {
 				}
 			}
 		);
+	}
+
+	/**
+	 * Adds all the elements of this sequence to the given {@code collection}.
+	 *
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <R> The type of the elements of the {@code collection}
+	 * @param collection The collection that is to be filled up
+	 * @return the same collection as the one given
+	 * @throws IllegalArgumentException if the specified collection is {@code null}
+	 */
+	public final <R extends Collection<T>> R collect(R collection) {
+		if (collection == null) {
+			throw new IllegalArgumentException("collection must not be null.");
+		}
+
+		for (T element : this.source) {
+			collection.add(element);
+		}
+
+		return collection;
+	}
+
+	/**
+	 * Adds all the elements of this sequence to the given {@code map} with the
+	 * keys extracted by {@code keySelector} from the correspondig element of
+	 * this sequence.
+	 *
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <K> The type of the key
+	 * @param <R> The type of the value
+	 * @param map The map that is to be filled up
+	 * @param keySelector A function to extract the key of an element
+	 * @return the same map as the one given
+	 * @throws IllegalArgumentException if the specified map or keySelector is {@code null}
+	 */
+	public final <K, R extends Map<K, T>> R collect(R map, Func<? super T, ? extends K> keySelector) {
+		return collect(map, keySelector, Funcs.<T>self());
+	}
+
+	/**
+	 * Adds all the elements of this sequence to the given {@code map} with the
+	 * keys extracted by {@code keySelector} and the elements produced by
+	 * {@code elementSelecotr} from the corresponding element of this sequence.
+	 *
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <K> The type of the key
+	 * @param <R> The type of the value
+	 * @param map The map that is to be filled up
+	 * @param keySelector A function to extract the key of an element
+	 * @param elementSelector A function to produce the resulting element from the
+	 *                        given element
+	 * @return the same map as the one given
+	 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
+	 */
+	public final <K, V, R extends Map<K, V>> R collect(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
+		if (map == null) {
+			throw new IllegalArgumentException("map must not be null.");
+		}
+
+		if (keySelector == null) {
+			throw new IllegalArgumentException("keySelector must not be null.");
+		}
+
+		if (elementSelector == null) {
+			throw new IllegalArgumentException("elementSelector must not be null.");
+		}
+
+		for (T element : this.source) {
+			map.put(keySelector.invoke(element), elementSelector.invoke(element));
+		}
+
+		return map;
 	}
 
 	/**
@@ -741,82 +817,6 @@ public class Sequence<T> implements Iterable<T> {
 				}
 			}
 		);
-	}
-
-	/**
-	 * Adds all the elements of this sequence to the given {@code collection}.
-	 *
-	 * The result is immediatly evaluated.
-	 *
-	 * @param <R> The type of the elements of the {@code collection}
-	 * @param collection The collection that is to be filled up
-	 * @return the same collection as the one given
-	 * @throws IllegalArgumentException if the specified collection is {@code null}
-	 */
-	public final <R extends Collection<T>> R fill(R collection) {
-		if (collection == null) {
-			throw new IllegalArgumentException("collection must not be null.");
-		}
-
-		for (T element : this.source) {
-			collection.add(element);
-		}
-
-		return collection;
-	}
-
-	/**
-	 * Adds all the elements of this sequence to the given {@code map} with the
-	 * keys extracted by {@code keySelector} from the correspondig element of
-	 * this sequence.
-	 *
-	 * The result is immediatly evaluated.
-	 *
-	 * @param <K> The type of the key
-	 * @param <R> The type of the value
-	 * @param map The map that is to be filled up
-	 * @param keySelector A function to extract the key of an element
-	 * @return the same map as the one given
-	 * @throws IllegalArgumentException if the specified map or keySelector is {@code null}
-	 */
-	public final <K, R extends Map<K, T>> R fill(R map, Func<? super T, ? extends K> keySelector) {
-		return fill(map, keySelector, Funcs.<T>self());
-	}
-
-	/**
-	 * Adds all the elements of this sequence to the given {@code map} with the
-	 * keys extracted by {@code keySelector} and the elements produced by
-	 * {@code elementSelecotr} from the corresponding element of this sequence.
-	 *
-	 * The result is immediatly evaluated.
-	 *
-	 * @param <K> The type of the key
-	 * @param <R> The type of the value
-	 * @param map The map that is to be filled up
-	 * @param keySelector A function to extract the key of an element
-	 * @param elementSelector A function to produce the resulting element from the
-	 *                        given element
-	 * @return the same map as the one given
-	 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
-	 */
-	public final <K, V, R extends Map<K, V>> R fill(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
-		if (map == null) {
-			throw new IllegalArgumentException("map must not be null.");
-		}
-
-		if (keySelector == null) {
-			throw new IllegalArgumentException("keySelector must not be null.");
-		}
-
-		if (elementSelector == null) {
-			throw new IllegalArgumentException("elementSelector must not be null.");
-		}
-
-		for (T element : this.source) {
-			map.put(keySelector.invoke(element), elementSelector.invoke(element));
-		}
-
-		return map;
 	}
 
 	/**
