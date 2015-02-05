@@ -470,7 +470,7 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns a new {@code HashMap} with the keys provided by {@code keySelector}
+	 * Returns a new {@code HashMap} with the keys extracted by {@code keySelector}
 	 * and the correspondig element of this sequence.
 	 *
 	 * The result is immediatly evaluated.
@@ -486,8 +486,8 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns a new {@code HashMap} with the keys provided by {@code keySelector}
-	 * and the correspondig element provided by {@code elementSelector}.
+	 * Returns a new {@code HashMap} with the keys extracted by {@code keySelector}
+	 * and the correspondig element produced by {@code elementSelector}.
 	 *
 	 * The result is immediatly evaluated.
 	 *
@@ -536,17 +536,18 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Maps each element of this sequence to a Sequence and flattens the resulting
+	 * sequence (sequence of sequences) into one sequence.
 	 *
-	 * A.k.a. flat, flatMap, flatten
+	 * A.k.a. flat, flat map, flatten, select many
 	 *
-	 * @param collectionSelector
-	 * @param <R>
-	 * @return
-	 * @throws IllegalArgumentException if the specified resultSelector is null
+	 * @param <R> The type of the resulting element
+	 * @param collectionSelector A function that returns the collection that is to
+	 *                           be flattenend.
+	 * @return a flattened sequence
+	 * @throws IllegalArgumentException if the specified collectionSelector is null
 	 */
-
-	// even though the function of bind should actually return a Sequence, maybe it makes sense to return an iterable instead...
-	public final <R> Sequence<R> bind(final Func<? super T, ? extends Sequence<? extends R>> collectionSelector) {
+	public final <R> Sequence<R> bind(final Func<? super T, ? extends Iterable<? extends R>> collectionSelector) {
 		if (collectionSelector == null) {
 			throw new IllegalArgumentException("collectionSelector must not be null.");
 		}
@@ -562,11 +563,12 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Concatenates two sequences. The Concat<TSource>(IEnumerable<TSource>, IEnumerable<TSource>) method differs of
-	 * the Union method because the Concat<TSource>(IEnumerable<TSource>, IEnumerable<TSource>) method returns all the
-	 * original elements in the input sequences. The Union method returns only unique elements.
-	 * @param other
-	 * @return
+	 * Concatenates two sequences by appending {@code other} to this sequence.
+	 *
+	 * A.k.a. append
+	 *
+	 * @param other The other elements to concat
+	 * @return the concatenated sequence
 	 */
 	@SafeVarargs
 	@SuppressWarnings("varargs")
@@ -575,10 +577,13 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Concatenates two sequences by appending {@code other} to this sequence.
 	 *
-	 * @param other
-	 * @return
-	 * @throws IllegalArgumentException if other is null
+	 * A.k.a. append
+	 *
+	 * @param other The other Iterable to concat
+	 * @return the concatenated sequence
+	 * @throws IllegalArgumentException if other is {@code null}
 	 */
 	public final Sequence<T> concat(final Iterable<? extends T> other) {
 		if (other == null) {
@@ -631,10 +636,14 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * The set difference of two sets is defined as the members of the first set that do not appear in the second set.
-	 * @param other An IEnumerable<T> whose elements that also occur in the first sequence will cause those elements to
-	 *              be removed of the returned sequence.
-	 * @return
+	 * The set difference of two sets is defined as the members of the first
+	 * set that do not appear in the second set.
+	 *
+	 * A.k.a. diff
+	 *
+	 * @param other An Array whose elements that also occur in the first sequence
+	 *              will cause those elements to be removed of the returned sequence.
+	 * @return the set difference of two sets
 	 */
 	public final Sequence<T> difference(T[] other) {
 		if (other == null) {
@@ -645,25 +654,49 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * The set difference of two sets is defined as the members of the first set
+	 * that do not appear in the second set.
 	 *
-	 * @param other
-	 * @throws IllegalArgumentException if other is null
-	 * @return
+	 * A.k.a. diff
+	 *
+	 * @param other An Iterable whose elements that also occur in the first sequence
+	 *              will cause those elements to be removed of the returned sequence.
+	 * @return the set difference of two sets
+	 * @throws IllegalArgumentException if other is {@code null}
 	 */
 	public final Sequence<T> difference(Iterable<? extends T> other) {
 		return difference(other, new DefaultEqualityComparator<T>());
 	}
 
+	/**
+	 * The set difference of two sets is defined as the members of the first set
+	 * that do not appear in the second set. The comparator is used to specifically
+	 * compare the elements.
+	 *
+	 * A.k.a. diff
+	 *
+	 * @param other An Array whose elements that also occur in the first sequence
+	 *              will cause those elements to be removed of the returned sequence.
+	 * @param comparator An EqualityComparator that is used to compare the elements
+	 * @return the set difference of two sets
+	 * @throws IllegalArgumentException if comparator is null
+	 */
 	public final Sequence<T> difference(final T[] other, final EqualityComparator<? super T> comparator) {
 		return null;
 	}
 
 	/**
+	 * The set difference of two sets is defined as the members of the first set
+	 * that do not appear in the second set. The comparator is used to specifically
+	 * compare the elements.
 	 *
-	 * @param other
-	 * @param comparator
-	 * @throws IllegalArgumentException if other or the comparator is null
-	 * @return
+	 * A.k.a. diff
+	 *
+	 * @param other An Iterable whose elements that also occur in the first sequence
+	 *              will cause those elements to be removed of the returned sequence.
+	 * @param comparator An EqualityComparator that is used to compare the elements
+	 * @return the set difference of two sets
+	 * @throws IllegalArgumentException if other or comparator is null
 	 */
 	public final Sequence<T> difference(final Iterable<? extends T> other, final EqualityComparator<? super T> comparator) {
 		if (other == null) {
@@ -678,24 +711,22 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Returns distinct elements of a sequence by using the default equality comparer to compare values.
-	 * The Distinct<TSource>(IEnumerable<TSource>) method returns an unordered sequence that contains no duplicate values.
-	 * It uses the default equality comparer, Default, to compare values.
+	 * Returns an unordered sequence of distinct elements by using the
+	 * {@code DefaultEqualityComparator} to compare values.
 	 *
-	 * The default equality comparer, Default, is used to compare values of the types that implement the IEquatable<T>
-	 * generic interface. To compare a custom data type, you must implement this interface and provide your own
-	 * GetHashCode and Equals methods for the type.
-	 * @return
+	 * @return an unordered sequence of distinct elements
 	 */
 	public final Sequence<T> distinct() {
 		return distinct(new DefaultEqualityComparator<T>());
 	}
 
 	/**
+	 * Returns an unordered sequence of distinct elements by using the provided
+	 * {@code comparator}.
 	 *
-	 * @param comparator
-	 * @throws IllegalArgumentException if the comparator is null
-	 * @return
+	 * @param comparator The comparator that is used to compare the values
+	 * @throws IllegalArgumentException if the comparator is {@code null}
+	 * @return an unordered sequence of distinct elements
 	 */
 	public final Sequence<T> distinct(final EqualityComparator<? super T> comparator) {
 		if (comparator == null) {
@@ -713,13 +744,15 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Adds all the elements of this sequence to the given {@code collection}.
 	 *
-	 * @param collection
-	 * @param <R>
-	 * @return
-	 * @throws IllegalArgumentException if the specified collection is null
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <R> The type of the elements of the {@code collection}
+	 * @param collection The collection that is to be filled up
+	 * @return the same collection as the one given
+	 * @throws IllegalArgumentException if the specified collection is {@code null}
 	 */
-	// TODO; rename to something like: fill
 	public final <R extends Collection<T>> R fill(R collection) {
 		if (collection == null) {
 			throw new IllegalArgumentException("collection must not be null.");
@@ -733,31 +766,39 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Adds all the elements of this sequence to the given {@code map} with the
+	 * keys extracted by {@code keySelector} from the correspondig element of
+	 * this sequence.
 	 *
-	 * @param map
-	 * @param keySelector
-	 * @param <K>
-	 * @param <R>
-	 * @return
-	 * @throws IllegalArgumentException if the specified map or keySelector is null
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <K> The type of the key
+	 * @param <R> The type of the value
+	 * @param map The map that is to be filled up
+	 * @param keySelector A function to extract the key of an element
+	 * @return the same map as the one given
+	 * @throws IllegalArgumentException if the specified map or keySelector is {@code null}
 	 */
-	// TODO: rename to something like: fill
 	public final <K, R extends Map<K, T>> R fill(R map, Func<? super T, ? extends K> keySelector) {
 		return fill(map, keySelector, Funcs.<T>self());
 	}
 
 	/**
+	 * Adds all the elements of this sequence to the given {@code map} with the
+	 * keys extracted by {@code keySelector} and the elements produced by
+	 * {@code elementSelecotr} from the corresponding element of this sequence.
 	 *
-	 * @param map
-	 * @param keySelector
-	 * @param elementSelector
-	 * @param <K>
-	 * @param <V>
-	 * @param <R>
-	 * @return
+	 * The result is immediatly evaluated.
+	 *
+	 * @param <K> The type of the key
+	 * @param <R> The type of the value
+	 * @param map The map that is to be filled up
+	 * @param keySelector A function to extract the key of an element
+	 * @param elementSelector A function to produce the resulting element from the
+	 *                        given element
+	 * @return the same map as the one given
 	 * @throws IllegalArgumentException if the specified map, keySelector or elementSelector is null
 	 */
-	// TODO: rename to something like: fill
 	public final <K, V, R extends Map<K, V>> R fill(R map, Func<? super T, ? extends K> keySelector, Func<? super T, ? extends V> elementSelector) {
 		if (map == null) {
 			throw new IllegalArgumentException("map must not be null.");
@@ -803,10 +844,10 @@ public class Sequence<T> implements Iterable<T> {
 	 * the condition.
 	 *
 	 * @param predicate A function to test each element for a condition
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
 	 * @return an {@code Option} with the first element in this sequence that
 	 * satisfies a condition or an{@code Option} of none if this sequence does
 	 * not have any elements or none of the elements  satsify the condition
+	 * @throws java.lang.IllegalArgumentException if the specified predicate is {@code null}
 	 */
 	public final Option<T> first(Predicate<? super T> predicate) {
 		return select(predicate).first();
@@ -1125,10 +1166,10 @@ public class Sequence<T> implements Iterable<T> {
 	 * the condition.
 	 *
 	 * @param predicate A function to test each element for a condition
-	 * @throws java.lang.IllegalArgumentException if the specified predicate is null
 	 * @return an {@code Option} with the last element in this sequence that satisfies
 	 * a condition or an{@code Option} of none if this sequence does not have any
 	 * elements or none of the elements satsify the condition
+	 * @throws java.lang.IllegalArgumentException if the specified predicate is {@code null}
 	 */
 	public final Option<T> last(Predicate<? super T> predicate) {
 		return select(predicate).last();
@@ -1139,11 +1180,9 @@ public class Sequence<T> implements Iterable<T> {
 	 * This projection method requires the transform function, selector, to produce one value for each value in the
 	 * source sequence, source. If selector returns a value that is itself a collection, it is up to the consumer to
 	 * traverse the subsequences manually. In such a situation, it might be better for your query to return a single
-	 * coalesced sequence of values. To achieve this, use the SelectMany method instead of Select. Although SelectMany
-	 * works similarly to Select, it differs in that the transform function returns a collection that is then expanded
-	 * by SelectMany before it is returned.
-	 *
-	 * In query expression syntax, a select (Visual C#) or Select (Visual Basic) clause translates to an invocation of Select.
+	 * coalesced sequence of values. To achieve this, use the bind method instead of map. Although bind
+	 * works similarly to map, it differs in that the transform function returns a collection that is then expanded
+	 * by bind before it is returned.
 	 *
 	 * @param <R>
 	 * @param resultSelector
@@ -1162,10 +1201,10 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Prepends one ore more values to a sequence.
-	 * @param other
-	 * @return Returns a sequence where one or more values is prepended to it.
-
+	 * Concatenates two sequences by prepending {@code other} to this sequence.
+	 *
+	 * @param other The other elements to concat
+	 * @return the concatenated sequence
 	 */
 	@SafeVarargs
 	@SuppressWarnings("varargs")
@@ -1174,9 +1213,10 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
+	 * Concatenates two sequences by prepending {@code other} to this sequence.
 	 *
-	 * @param other
-	 * @return
+	 * @param other The other sequence to concat
+	 * @return the concatenated sequence
 	 */
 	public final Sequence<T> prepend(final Iterable<? extends T> other) {
 		if (other == null) {
@@ -1194,11 +1234,10 @@ public class Sequence<T> implements Iterable<T> {
 	}
 
 	/**
-	 * Inverts the order of the elements in a sequence. Unlike OrderBy, this sorting method does not consider the actual
-	 * values themselves in determining the order. Rather, it just returns the elements in the reverse order of which they are produced by the underlying source.
-
-	 * @throws IllegalArgumentException if other is null
-	 * @return A sequence whose elements correspond to those of the input sequence in reverse order.
+	 * Inverts the order of the elements in a sequence.
+	 *
+	 * @return a sequence whose elements correspond to those of the input sequence in reverse order.
+	 * @throws IllegalArgumentException if other is {@code null}
 	 */
 	public final Sequence<T> reverse() {
 		Iterable<T> iterable;
