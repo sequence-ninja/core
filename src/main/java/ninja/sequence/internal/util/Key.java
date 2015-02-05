@@ -25,7 +25,7 @@ public class Key<T> {
 			return false;
 		}
 
-		Key<T> key = (Key<T>)other;
+		Key<? extends T> key = (Key<? extends T>)other;
 
 		if (this.comparator != null) {
 			return this.comparator.equals(this.value, key.value);
