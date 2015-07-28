@@ -157,6 +157,18 @@ public class OptionTest {
 		assertThat(actual.get()).isNull();
 	}
 
+	@Test
+	public void equals_none() {
+		assertThat(Option.none().equals(Option.none())).isTrue();
+	}
+
+	@Test
+	public void equals_some() {
+		assertThat(Option.some("a").equals(Option.some("a"))).isTrue();
+		assertThat(Option.some("a").equals(Option.some("b"))).isFalse();
+	}
+
+
 	// TODO: test iterator
 
 	// TODO: test map

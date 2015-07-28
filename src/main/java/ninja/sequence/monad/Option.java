@@ -2,7 +2,9 @@ package ninja.sequence.monad;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import ninja.sequence.contract.Check;
 import ninja.sequence.delegate.Action;
@@ -150,6 +152,10 @@ public abstract class Option<T> implements Iterable<T> {
 	 */
 	public abstract <TResult> Option<TResult> bind(Func<? super T, Option<TResult>> func);
 
+	public abstract List<T> asList();
+
+	public abstract Set<T> asSet();
+
 	static class None<T> extends Option<T> {
 		@Override
 		public boolean isPresent() {
@@ -193,6 +199,16 @@ public abstract class Option<T> implements Iterable<T> {
 		}
 
 		@Override
+		public List<T> asList() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public Set<T> asSet() {
+			return Collections.emptySet();
+		}
+
+		@Override
 		public Iterator<T> iterator() {
 			return Collections.emptyIterator();
 		}
@@ -229,7 +245,7 @@ public abstract class Option<T> implements Iterable<T> {
 
 		@Override
 		public T getOrElse(T value) {
-			return get();
+			return this.value;
 		}
 
 		@Override
@@ -260,6 +276,16 @@ public abstract class Option<T> implements Iterable<T> {
 			}
 
 			return result;
+		}
+
+		@Override
+		public List<T> asList() {
+			return Collections.singletonList(this.value);
+		}
+
+		@Override
+		public Set<T> asSet() {
+			return Collections.singleton(this.value);
 		}
 
 		@Override
